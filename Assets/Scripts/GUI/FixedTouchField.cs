@@ -3,22 +3,12 @@ using UnityEngine.EventSystems;
 
 public class FixedTouchField : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
-    [HideInInspector]
-    public Vector2 TouchDist;
-    [HideInInspector]
-    public Vector2 PointerOld;
-    [HideInInspector]
-    protected int PointerId;
-    [HideInInspector]
-    public bool Pressed;
+    [HideInInspector] public Vector2 TouchDist;
+    [HideInInspector] public Vector2 PointerOld;
+    [HideInInspector] public bool Pressed;
 
-    // Use this for initialization
-    void Start()
-    {
+    [HideInInspector] protected int PointerId;
 
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (Pressed)
@@ -46,7 +36,6 @@ public class FixedTouchField : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         PointerId = eventData.pointerId;
         PointerOld = eventData.position;
     }
-
 
     public void OnPointerUp(PointerEventData eventData)
     {

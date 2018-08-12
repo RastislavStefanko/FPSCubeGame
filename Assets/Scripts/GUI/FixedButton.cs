@@ -3,20 +3,7 @@ using UnityEngine.EventSystems;
 
 public class FixedButton : MonoBehaviour, IPointerUpHandler, IPointerDownHandler
 {
-    [HideInInspector]
-    public bool Pressed;
-
-    // Use this for initialization
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    [HideInInspector] public bool Pressed;
 
     public void OnPointerDown(PointerEventData eventData)
     {
