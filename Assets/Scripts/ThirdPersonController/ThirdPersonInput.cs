@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityStandardAssets.Characters.ThirdPerson;
 
 [RequireComponent(typeof(ThirdPersonUserControl))]
@@ -16,6 +15,10 @@ public class ThirdPersonInput : MonoBehaviour {
     public FixedButton WeaponButton;
     public FixedJoystick joystick;
     public FixedTouchField TouchField;
+    
+    [SerializeField] private int zoomDist;
+    [SerializeField] private int unzoomDist;
+    [SerializeField] private int smoothZoomMove;
 
     protected float CameraAngleX;
     protected float CameraAngleY;
@@ -42,6 +45,15 @@ public class ThirdPersonInput : MonoBehaviour {
             transform.rotation = Quaternion.AngleAxis(CameraAngleX + 180, Vector3.up);
         }
 
+        // zooming
+        if (TouchField.DoubleClick)
+        {
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, zoomDist, Time.deltaTime * smoothZoomMove);
+        }
+        else
+        {
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, unzoomDist, Time.deltaTime * smoothZoomMove);
+        }
 
         // rotate player based on the touch
         CameraAngleX += TouchField.TouchDist.x * CameraAngleSpeedX;

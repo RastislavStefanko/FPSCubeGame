@@ -1,13 +1,19 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 public class FixedTouchField : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [HideInInspector] public Vector2 TouchDist;
     [HideInInspector] public Vector2 PointerOld;
     [HideInInspector] public bool Pressed;
+    [HideInInspector] public bool DoubleClick;
 
     [HideInInspector] protected int PointerId;
+
+    [SerializeField] private float doubleClickRange = 0.5f;
+
+    private int counter;
 
     void Update()
     {
@@ -35,11 +41,38 @@ public class FixedTouchField : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         Pressed = true;
         PointerId = eventData.pointerId;
         PointerOld = eventData.position;
+
+        counter++;
+        if (counter == 1)
+        {
+            StartCoroutine("DoubleClickCoroutine");
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
         Pressed = false;
+    }
+
+    IEnumerator DoubleClickCoroutine()
+    {
+        yield return new WaitForSeconds(doubleClickRange);
+
+        if(counter > 1)
+        {
+            if (DoubleClick)
+            {
+                DoubleClick = false;
+            }
+            else
+            {
+                DoubleClick = true;
+            }
+        }
+
+        yield return new WaitForSeconds(0.05f);
+        counter = 0;
+
     }
     
 }
