@@ -12,10 +12,12 @@ public class WeaponSystem : MonoBehaviour {
     [SerializeField] private ParticleSystem shootingParticle;
     [SerializeField] private GameObject rifle;
 
-    //public PlayerAim playerAim;
+    public PlayerAim playerAim;
     public Transform fireFrom;
     public float shootCooldown;
-    
+
+    private float cameraPosX;
+
 	void Start () {
         playerInput = GetComponent<ThirdPersonInput>();
         animator = GetComponent<Animator>();
@@ -28,15 +30,25 @@ public class WeaponSystem : MonoBehaviour {
         ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
         Debug.DrawRay(ray.origin, ray.direction, Color.red);
 
-        /* TO DO
-        playerAim.SetRotation(Camera.main.transform.position.y/5, Camera.main.transform.position.x);
-
-        if (aim)
+        if (playerInput.Zoom)
         {
-            animator.SetFloat("AimAngleZ", playerAim.GetAngleX());
-            animator.SetFloat("AimAngleX", playerAim.GetAngleZ());
-        }*/
+            aim = true;
 
+            // clamp camera position x to the selected range
+            cameraPosX = Mathf.Clamp(cameraPosX + playerInput.GetTouchDistX(), -playerInput.rangeAim, playerInput.rangeAim);
+
+            // set rotation of player aim based on camera position
+            playerAim.SetRotation(Camera.main.transform.position.y / 5, cameraPosX/playerInput.rangeAim);
+
+            animator.SetFloat("AimAngleY", playerAim.GetAngleX());
+            animator.SetFloat("AimAngleX", playerAim.GetAngleY());
+        }
+        else
+        {
+            cameraPosX = 0;
+        }
+
+        animator.SetBool("Zoom", playerInput.Zoom);
         animator.SetBool("Aim", aim);
         animator.SetBool("Weapon", weapon);
         animator.SetBool("Fire", playerInput.FireButton.Pressed);
@@ -76,7 +88,7 @@ public class WeaponSystem : MonoBehaviour {
             }
 
         }
-        else
+        else if(!playerInput.Zoom)
         {
             aim = false;
         }

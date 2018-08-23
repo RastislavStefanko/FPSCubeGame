@@ -2,21 +2,39 @@
 
 public class PlayerAim : MonoBehaviour {
 
-	public void SetRotation(float amountX, float amountZ)
+    /// <summary>
+    /// set rotation of aim object
+    /// </summary>
+    /// <param name="amountX"> amount of x angle </param>
+    /// <param name="amountY"> amount of y angle </param>
+	public void SetRotation(float amountX, float amountY)
     {
-        transform.eulerAngles = new Vector3(amountX, amountZ, transform.eulerAngles.z);
+        transform.eulerAngles = new Vector3(amountX, amountY, transform.eulerAngles.z);
     }
 	
+    /// <summary>
+    /// get x angle
+    /// </summary>
+    /// <returns> x angle </returns>
     public float GetAngleX()
     {
         return transform.eulerAngles.x;
     }
 
-    public float GetAngleZ()
+    /// <summary>
+    /// get y angle with angle check
+    /// </summary>
+    /// <returns> y angle </returns>
+    public float GetAngleY()
     {
         return CheckAngle(transform.eulerAngles.y);
     }
 
+    /// <summary>
+    /// transform value from 180 - 360 to the -180 - 0
+    /// </summary>
+    /// <param name="value"> value to transform </param>
+    /// <returns> transformed value </returns>
     public float CheckAngle(float value)
     {
         float angle = value - 180;
@@ -29,9 +47,4 @@ public class PlayerAim : MonoBehaviour {
         return angle + 180;
 
     }
-
-	// Update is called once per frame
-	void Update () {
-        //Debug.Log(GetAngleZ());
-	}
 }

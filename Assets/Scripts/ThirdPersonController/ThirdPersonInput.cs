@@ -15,15 +15,21 @@ public class ThirdPersonInput : MonoBehaviour {
     public FixedButton WeaponButton;
     public FixedJoystick joystick;
     public FixedTouchField TouchField;
+    public int rangeAim;
+
+    public bool Zoom { get; set; }
     
     [SerializeField] private int zoomDist;
     [SerializeField] private int unzoomDist;
     [SerializeField] private int smoothZoomMove;
 
-    protected float CameraAngleX;
-    protected float CameraAngleY;
-    protected float CameraAngleSpeedX = 0.2f;
-    protected float CameraAngleSpeedY = 0.1f;
+    private float aimRangePoint;
+    private bool zoomFirstTime;
+
+    protected float cameraAngleX;
+    protected float cameraAngleY;
+    protected float cameraAngleSpeedX = 0.2f;
+    protected float cameraAngleSpeedY = 0.1f;
 
     void Start () {
         control = GetComponent<ThirdPersonUserControl>();
@@ -42,26 +48,54 @@ public class ThirdPersonInput : MonoBehaviour {
         if (FireButton.Pressed)
         {
             // rotate player to the aim angle
-            transform.rotation = Quaternion.AngleAxis(CameraAngleX + 180, Vector3.up);
+            transform.rotation = Quaternion.AngleAxis(cameraAngleX + 180, Vector3.up);
         }
 
         // zooming
         if (TouchField.DoubleClick)
         {
+            Zoom = true;
+
+            // if zooming first frame
+            if (zoomFirstTime)
+            {
+                zoomFirstTime = false;
+
+                // rotate player to the aim angle
+                transform.rotation = Quaternion.AngleAxis(cameraAngleX + 180, Vector3.up);
+
+                aimRangePoint = cameraAngleX;
+            }
+            
+            // clamp camera to the selected range
+            cameraAngleX = Mathf.Clamp(cameraAngleX + GetTouchDistX(), aimRangePoint - rangeAim, aimRangePoint + rangeAim);
+
             Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, zoomDist, Time.deltaTime * smoothZoomMove);
         }
         else
         {
+            Zoom = false;
+            zoomFirstTime = true;
+
+            // rotate player based on the touch
+            cameraAngleX += GetTouchDistX();
+
             Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, unzoomDist, Time.deltaTime * smoothZoomMove);
         }
 
-        // rotate player based on the touch
-        CameraAngleX += TouchField.TouchDist.x * CameraAngleSpeedX;
-        //CameraAngleX = Mathf.Clamp(CameraAngleX + TouchField.TouchDist.x * CameraAngleSpeedX, -20, 20);
-        CameraAngleY = Mathf.Clamp(CameraAngleY - TouchField.TouchDist.y * CameraAngleSpeedY, 0.5f, 5);
+        cameraAngleY = Mathf.Clamp(cameraAngleY - TouchField.TouchDist.y * cameraAngleSpeedY, 0.5f, 5);
 
         // rotate camera around player
-        Camera.main.transform.position = transform.position + Quaternion.AngleAxis(CameraAngleX, Vector3.up) * new Vector3(0, CameraAngleY, 5);
+        Camera.main.transform.position = transform.position + Quaternion.AngleAxis(cameraAngleX, Vector3.up) * new Vector3(0, cameraAngleY, 5);
         Camera.main.transform.rotation = Quaternion.LookRotation(transform.position + Vector3.up * 2.5f - Camera.main.transform.position, Vector3.up);
+    }
+
+    /// <summary>
+    /// get touch distance multiply by camera angle x
+    /// </summary>
+    /// <returns> x touch distance </returns>
+    public float GetTouchDistX()
+    {
+        return TouchField.TouchDist.x * cameraAngleSpeedX;
     }
 }
